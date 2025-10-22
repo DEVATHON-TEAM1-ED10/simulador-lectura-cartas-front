@@ -1,75 +1,75 @@
 @import "tailwindcss";
+@import "./styles/fonts.css";
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  --color-charred-umber: oklch(0.3197 0.019 18.2);
+  --color-old-gold: oklch(0.6304 0.0968 88.81);
+  --color-ashen-gray: oklch(0.5048 0.0208 59.16);
+  --color-bone-white: oklch(0.8934 0.0342 94.08);
+  --color-occult-red: oklch(0.4396 0.1269 23.94);
+  --color-antique-parchment: oklch(0.77 0.10 85.29);
+  --color-dark-halloween: oklch(0.1568 0.0184 65.91);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
+@layer base {
 
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  html,
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+    /* Disable overscroll behavior */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
   }
 
-  a:hover {
-    color: #747bff;
+  html {
+    scrollbar-gutter: stable;
+    background: var(--color-dark-halloween);
+    color: var(--color-bone-white);
   }
 
-  button {
-    background-color: #f9f9f9;
+  /* Webkit Browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 10px;
   }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-old-gold);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-old-gold);
+    border-radius: 5px;
+    border: 2px solid oklch(77.526% 0.09063 67.442 / 0.4);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-old-gold / 0.8);
+    /* Efecto hover */
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-color: var(--color-old-gold) var(--color-dark-halloween);
+    scrollbar-width: thin;
+  }
+}
+
+.font-cardo {
+  font-family: "Cardo", serif;
+}
+
+.font-crimson-pro {
+  font-family: "Crimson Pro", serif;
+}
+
+.font-playfair-display {
+  font-family: "Playfair Display", serif;
+}
+
+.font-quicksand {
+  font-family: "Quicksand", sans-serif;
 }
