@@ -1,10 +1,10 @@
 import './App.css';
+import Cards from './components/cards/Cards';
 
 function App() {
-
   return (
-    <div className='text-3xl font-bold underline'>
-      Hola
+    <div className="max-w-7xl m-auto">
+      <Cards />
     </div>
   );
 }
