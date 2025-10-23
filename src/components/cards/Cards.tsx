@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Card from './Card';
 
 const Cards = () => {
@@ -113,6 +114,9 @@ const Cards = () => {
       description: 'descripción',
     },
   ];
+  const MAX_SELECCTIONS = 3;
+  const [selectedCardsId, setSelectedCardsId] = useState([]);
+  const isPredictionReady = selectedCardsId.length === MAX_SELECCTIONS;
 
   return (
     <>
