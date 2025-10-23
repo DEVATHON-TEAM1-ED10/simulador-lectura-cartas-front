@@ -115,8 +115,21 @@ const Cards = () => {
     },
   ];
   const MAX_SELECCTIONS = 3;
-  const [selectedCardsId, setSelectedCardsId] = useState([]);
-  const isPredictionReady = selectedCardsId.length === MAX_SELECCTIONS;
+  const [selectedCardIds, setSelectedCardIds] = useState([]);
+  const isPredictionReady = selectedCardIds.length === MAX_SELECCTIONS;
+
+  const handleCardClick = (cardId: string) => {
+    setSelectedCardIds((prevSelectedIds) => {
+      if (prevSelectedIds.includes(cardId)) {
+        return prevSelectedIds.filter((id) => id !== cardId);
+      } else {
+        if (prevSelectedIds.length < MAX_SELECCTIONS) {
+          return [...prevSelectedIds, cardId];
+        }
+        return prevSelectedIds;
+      }
+    });
+  };
 
   return (
     <>
