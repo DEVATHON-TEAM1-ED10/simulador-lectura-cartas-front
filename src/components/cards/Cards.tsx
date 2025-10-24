@@ -158,7 +158,12 @@ const Cards = () => {
                 after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px]
                 after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent">
             {allCards.map(card => (
-              <Card key={card.id} />
+              <Card 
+                key={card.id}
+                card = {card}
+                onClick = {handleCardClick}
+                isSelected = {selectedCardIds.includes(card.id)}
+                isDesabled = {!selectedCardIds.includes(card.id) && selectedCardIds.length === MAX_SELECCTIONS} />
             ))}
           </div>
         </div>
