@@ -115,7 +115,7 @@ const Cards = () => {
     },
   ];
   const MAX_SELECCTIONS = 3;
-  const [selectedCardIds, setSelectedCardIds] = useState([]);
+  const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
   const isPredictionReady = selectedCardIds.length === MAX_SELECCTIONS;
 
   const handleCardClick = (cardId: string) => {
