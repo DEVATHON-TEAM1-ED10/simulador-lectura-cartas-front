@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import Card from './Card';
 
-const Cards = () => {
-  const allCards = [
+interface TarotCard {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const allCards: TarotCard[] = [
     {
       id: '1',
       name: 'El Loco',
@@ -115,8 +120,11 @@ const Cards = () => {
     },
   ];
   const MAX_SELECCTIONS = 3;
+
+const Cards = () => {
+  
   const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
-  const isPredictionReady = selectedCardIds.length === MAX_SELECCTIONS;
+  const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
 
   const handleCardClick = (cardId: string) => {
     setSelectedCardIds((prevSelectedIds) => {
@@ -130,6 +138,17 @@ const Cards = () => {
       }
     });
   };
+
+  const handlePrediction = () => {
+    if (isPredictionReady) {
+      console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
+      const selectedCards: TarotCard[] = allCards.filter(card => selectedCardIds.includes(card.id));
+      console.log('Detalles de las cartas seleccionadas:', selectedCards);
+      alert(`Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`);
+    }else{
+      console.log(`Selecciona ${MAX_SELECCTIONS} cartas para obtener una predicción.`);
+    }
+  }
 
   return (
     <>
@@ -153,11 +172,11 @@ const Cards = () => {
 
         <div className="w-full flex flex-col items-center relative">
           <div
-            className="w-[1000px] h-[500px] grid grid-cols-12 place-items-center before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
+            className="w-[1000px] h-[500px] grid grid-cols-12 place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
                 before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparent
                 after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px]
                 after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent">
-            {allCards.map(card => (
+            {allCards.map((card: TarotCard) => (
               <Card 
                 key={card.id}
                 card = {card}
