@@ -188,7 +188,12 @@ const Cards = () => {
         </div>
 
         <div className="w-full mt-6 text-center">
-          <button className="w-48 h-11 border-1 rounded-4xl font-cardo text-xl">
+          <button 
+            onClick = {handlePrediction}
+            disabled = {!isPredictionReady}
+            className={`w-48 h-11 border-1 rounded-4xl font-cardo text-xl transition-colors
+              ${isPredictionReady ? 'bg-old-gold text-charred-umber hover:bg-goldenrod hover:text-white cursor-pointer' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`
+            }>
             Predicción
           </button>
         </div>
