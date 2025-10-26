@@ -182,7 +182,7 @@ const Cards = () => {
                 card = {card}
                 onClick = {handleCardClick}
                 isSelected = {selectedCardIds.includes(card.id)}
-                isDesabled = {!selectedCardIds.includes(card.id) && selectedCardIds.length === MAX_SELECCTIONS} />
+                isDisabled = {!selectedCardIds.includes(card.id) && selectedCardIds.length === MAX_SELECCTIONS} />
             ))}
           </div>
         </div>
