@@ -1,7 +1,13 @@
+import { useState } from 'react';
 import Card from './Card';
 
-const Cards = () => {
-  const allCards = [
+interface TarotCard {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const allCards: TarotCard[] = [
     {
       id: '1',
       name: 'El Loco',
@@ -113,6 +119,36 @@ const Cards = () => {
       description: 'descripción',
     },
   ];
+  const MAX_SELECCTIONS = 3;
+
+const Cards = () => {
+  
+  const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
+  const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
+
+  const handleCardClick = (cardId: string) => {
+    setSelectedCardIds((prevSelectedIds) => {
+      if (prevSelectedIds.includes(cardId)) {
+        return prevSelectedIds.filter((id) => id !== cardId);
+      } else {
+        if (prevSelectedIds.length < MAX_SELECCTIONS) {
+          return [...prevSelectedIds, cardId];
+        }
+        return prevSelectedIds;
+      }
+    });
+  };
+
+  const handlePrediction = () => {
+    if (isPredictionReady) {
+      console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
+      const selectedCards: TarotCard[] = allCards.filter(card => selectedCardIds.includes(card.id));
+      console.log('Detalles de las cartas seleccionadas:', selectedCards);
+      alert(`Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`);
+    }else{
+      console.log(`Selecciona ${MAX_SELECCTIONS} cartas para obtener una predicción.`);
+    }
+  }
 
   return (
     <>
@@ -127,27 +163,38 @@ const Cards = () => {
 
           <p className="text-2xl font-cardo">
             Elige
-            <span className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2">
-              3
+            <span className={`inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 ${isPredictionReady ? 'bg-old-gold text-charred-umber border-old-gold' : 'bg-gray-400 text-gray-700 border-gray-400'}`}>
+              {selectedCardIds.length}
             </span>
-            cartas
+            de
+            <span className='inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 text-old-gold border-old-gold'>{MAX_SELECCTIONS}</span>cartas
           </p>
         </div>
 
         <div className="w-full flex flex-col items-center relative">
           <div
-            className="w-[1000px] h-[500px] grid grid-cols-12 place-items-center before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
+            className="w-[1000px] h-[500px] grid grid-cols-12 place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
                 before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparent
                 after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px]
                 after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent">
-            {allCards.map(card => (
-              <Card key={card.id} />
+            {allCards.map((card: TarotCard) => (
+              <Card 
+                key={card.id}
+                card = {card}
+                onClick = {handleCardClick}
+                isSelected = {selectedCardIds.includes(card.id)}
+                isDisabled = {!selectedCardIds.includes(card.id) && selectedCardIds.length === MAX_SELECCTIONS} />
             ))}
           </div>
         </div>
 
         <div className="w-full mt-6 text-center">
-          <button className="w-48 h-11 border-1 rounded-4xl font-cardo text-xl">
+          <button 
+            onClick = {handlePrediction}
+            disabled = {!isPredictionReady}
+            className={`w-48 h-11 border-1 rounded-4xl font-cardo text-xl transition-colors
+              ${isPredictionReady ? 'bg-old-gold text-charred-umber hover:bg-goldenrod hover:text-white cursor-pointer' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`
+            }>
             Predicción
           </button>
         </div>
