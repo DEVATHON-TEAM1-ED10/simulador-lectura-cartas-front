@@ -163,10 +163,11 @@ const Cards = () => {
 
           <p className="text-2xl font-cardo">
             Elige
-            <span className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2">
-              3
+            <span className={`inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 ${isPredictionReady ? 'bg-old-gold text-charred-umber border-old-gold' : 'bg-gray-400 text-gray-700 border-gray-400'}`}>
+              {selectedCardIds.length}
             </span>
-            cartas
+            de
+            <span className='inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 text-old-gold border-old-gold'>{MAX_SELECCTIONS}</span>cartas
           </p>
         </div>
 
