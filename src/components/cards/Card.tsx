@@ -15,8 +15,8 @@ interface CardProps {
 
 const Card:React.FC<CardProps> = ({card, onClick, isSelected, isDisabled}) => {
   const baseClasses = 'w-[120px] h-[190px] border-charred-umber border-2 cursor-pointer transition-transform duration-300';
-  const selectedClasses = 'border-4 border-green-500 scale-110 transform -translate-y-4 shadow-lg';
-  const disabledClasses = 'opacity-50 cursor-not-allowed';
+  const selectedClasses = 'border-4 border-old-gold scale-110 transform -translate-y-4 shadow-lg';
+  const disabledClasses = 'opacity-30 cursor-not-allowed pointer-events-none';
   const normalClasses = 'hover:scale-105';
 
   let finalClasses = baseClasses;
