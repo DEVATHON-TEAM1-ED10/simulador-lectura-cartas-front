@@ -1,177 +1,18 @@
 import { useEffect, useState } from 'react';
 import Card from './Card';
 import CardFlip from './CardFlip';
-import IMG1 from '../../assets/card-front/img1.png';
+import useAllCards from '../../hooks/useAllCards';
+import type { TarotCardAPI } from '../../types/carts-types';
+import Spinner from '../common/Spinner';
+import { api } from '../../api/axios';
 
-interface TarotCard {
-  id: string;
-  name: string;
-  description: string;
-  frontImage: string;
-  backImage: string;
-}
-
-const allCards: TarotCard[] = [
-  {
-    id: '1',
-    name: 'El Loco',
-    description: 'descripción',
-    frontImage: '../../src/assets/card-front/img1.png',
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '2',
-    name: 'El Mago',
-    description: 'descripción',
-    frontImage: '../../src/assets/card-front/img2.png',
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '3',
-    name: 'La Sacerdotisa',
-    description: 'descripción',
-    frontImage: '../../src/assets/card-front/img3.png',
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '4',
-    name: 'La Emperatriz',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '5',
-    name: 'El Emperador',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '6',
-    name: 'El Hierofante',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '7',
-    name: 'Los Enamorados',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '8',
-    name: 'El Carro',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '9',
-    name: 'La Fuerza',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '10',
-    name: 'El Ermitaño',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '11',
-    name: 'La Rueda de la Fortuna',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '12',
-    name: 'La Justicia',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '13',
-    name: 'El Colgado',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '14',
-    name: 'La Muerte',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '15',
-    name: 'La Templanza',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '16',
-    name: 'El Diablo',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '17',
-    name: 'La Torre',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '18',
-    name: 'La Estrella',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '19',
-    name: 'La Luna',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '20',
-    name: 'El Sol',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '21',
-    name: 'El Juicio',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-  {
-    id: '22',
-    name: 'El Mundo',
-    description: 'descripción',
-    frontImage: { IMG1 },
-    backImage: '../../src/assets/card-back/CARD_BACK.svg',
-  },
-];
 const MAX_SELECCTIONS = 3;
 
 const Cards = () => {
   const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
   const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
+
+  const { dataCards, loading, error } = useAllCards();
 
   const [isDisabledReset, setIsDisabledReset] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -199,16 +40,25 @@ const Cards = () => {
     });
   };
 
-  const handlePrediction = () => {
+  const handlePrediction = async () => {
     if (isPredictionReady) {
       console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
-      const selectedCards: TarotCard[] = allCards.filter(card =>
+      const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
         selectedCardIds.includes(card.id)
       );
-      console.log('Detalles de las cartas seleccionadas:', selectedCards);
-      alert(
-        `Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`
-      );
+      const card_ids = selectedCards.map(c => c.id);
+
+      try {
+        const response = await api.post('/predictions', { card_ids });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error en Predicción:', error);
+      }
+
+      //console.log('Detalles de las cartas seleccionadas:', selectedCards);
+      //alert(
+      //  `Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`
+      //);
       setIsDisabledReset(true);
     } else {
       console.log(
@@ -217,7 +67,7 @@ const Cards = () => {
     }
   };
 
-  const filterSelectedCards = allCards.filter(item =>
+  const filterSelectedCards = dataCards.filter(item =>
     selectedCardIds.includes(item.id)
   );
 
@@ -226,6 +76,25 @@ const Cards = () => {
     setIsDisabledReset(false);
     setShowButton(false);
   };
+
+  const StyleContainerBase =
+    'place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparentter:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] gradient-to-r after:from-transparent after:via-old-gold after:to-transparent';
+
+  if (loading) {
+    return (
+      <div className="w-full h-dvh flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
+        <Spinner size="large" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-dvh flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
+        <h1 className="text-6xl font-cardo text-old-gold">{error.message}</h1>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -253,23 +122,19 @@ const Cards = () => {
         </div>
 
         <div className="w-full flex flex-col items-center relative">
-          {selectedCardIds.length === 3 ? (
+          {selectedCardIds.length === 3 && (
             <div
-              className="w-[500px] h-[500px] grid grid-cols-3 place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
-                before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparent
-                after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px]
-                after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent">
-              {filterSelectedCards.map((card: TarotCard, index) => (
+              className={`${StyleContainerBase} w-[500px] h-[500px] grid grid-cols-3`}>
+              {filterSelectedCards.map((card: TarotCardAPI, index) => (
                 <CardFlip key={card.id} card={card} index={index} />
               ))}
             </div>
-          ) : (
+          )}
+
+          {selectedCardIds.length < 3 && (
             <div
-              className="w-[1000px] h-[500px] grid grid-cols-12 place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px]
-                before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparent
-                after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px]
-                after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent">
-              {allCards.map((card: TarotCard) => (
+              className={`${StyleContainerBase} w-[1000px] h-[500px] grid grid-cols-11`}>
+              {dataCards.map((card: TarotCardAPI) => (
                 <Card
                   key={card.id}
                   card={card}
