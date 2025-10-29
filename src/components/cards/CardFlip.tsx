@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
-
-interface TarotCard {
-  id: string;
-  name: string;
-  description: string;
-  frontImage: string;
-  backImage: string;
-}
+import BACK from '../../assets/card-back/CARD_BACK.svg';
+import type { TarotCardAPI } from '../../types/carts-types';
 
 interface CardProps {
-  card: TarotCard;
+  card: TarotCardAPI;
   index: number;
 }
 
 const CardFlip = ({ card, index }: CardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const imageUrl = `${apiUrl}/${card.image}`;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,21 +27,19 @@ const CardFlip = ({ card, index }: CardProps) => {
         className={`relative h-[190px] w-[120px] transition-all duration-[5000ms] [transform-style:preserve-3d] ${
           isFlipped ? '[transform:rotateY(180deg)]' : ''
         }`}>
-        {/* CARA TRASERA */}
         <figure className="absolute inset-0 h-full w-full border-charred-umber border-2 [backface-visibility:hidden]">
           <img
-            src={card.backImage}
-            alt="Cara frontal de la carta"
+            src={BACK}
+            alt="Reverso de la carta"
             className="w-full h-full object-cover pointer-events-none"
             loading="lazy"
           />
         </figure>
 
-        {/* CARA FRONTAL */}
         <figure className="absolute inset-0 h-full w-full border-charred-umber border-2 [transform:rotateY(180deg)] [backface-visibility:hidden]">
           <img
-            src={card.frontImage}
-            alt={card.name}
+            src={imageUrl}
+            alt="Frente de la carta"
             className="w-full h-full object-cover pointer-events-none"
             loading="lazy"
           />

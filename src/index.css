@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "./styles/fonts.css";
+@import 'tailwindcss';
+@import './styles/fonts.css';
 
 @theme {
   --color-charred-umber: oklch(0.3197 0.019 18.2);
@@ -7,12 +7,14 @@
   --color-ashen-gray: oklch(0.5048 0.0208 59.16);
   --color-bone-white: oklch(0.8934 0.0342 94.08);
   --color-occult-red: oklch(0.4396 0.1269 23.94);
-  --color-antique-parchment: oklch(0.77 0.10 85.29);
+  --color-antique-parchment: oklch(0.77 0.1 85.29);
   --color-dark-halloween: oklch(0.1568 0.0184 65.91);
+
+  --animate-eye-shade: eyeShade 3s infinite;
+  --animate-eye-move: eyeMove 3s infinite;
 }
 
 @layer base {
-
   html,
   body {
     display: flex;
@@ -59,17 +61,98 @@
 }
 
 .font-cardo {
-  font-family: "Cardo", serif;
+  font-family: 'Cardo', serif;
 }
 
 .font-crimson-pro {
-  font-family: "Crimson Pro", serif;
+  font-family: 'Crimson Pro', serif;
 }
 
 .font-playfair-display {
-  font-family: "Playfair Display", serif;
+  font-family: 'Playfair Display', serif;
 }
 
 .font-quicksand {
-  font-family: "Quicksand", sans-serif;
+  font-family: 'Quicksand', sans-serif;
+}
+
+@keyframes eyeShade {
+  0% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(5px);
+  }
+  40%,
+  50% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(-8px);
+  }
+  75% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes eyeMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(0px, 5px);
+  }
+  40%,
+  50% {
+    transform: translate(0px, -5px);
+  }
+  60% {
+    transform: translate(-10px, -5px);
+  }
+  75% {
+    transform: translate(-20px, 5px);
+  }
+  100% {
+    transform: translate(0, 10px);
+  }
+}
+
+/* --- ESTILOS PARA EL COMPONENTE Y PSEUDO-ELEMENTOS --- */
+
+/* Aplicamos las variables de CSS aquí */
+.eye-spinner {
+  background-color: var(--loader-bg);
+  border-color: var(--loader-border);
+}
+
+/* Estilo para el párpado (pseudo-elemento ::after) */
+.eye-spinner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -50%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--loader-lid);
+  z-index: 5;
+  border-bottom: 8px solid var(--loader-border);
+  box-sizing: border-box;
+  animation: var(--animate-eye-shade);
+}
+
+/* Estilo para la pupila (pseudo-elemento ::before) */
+.eye-spinner::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  bottom: 15px;
+  width: 32px;
+  height: 32px;
+  background-color: var(--loader-pupil);
+  z-index: 2;
+  border-radius: 50%;
+  animation: var(--animate-eye-move);
 }
