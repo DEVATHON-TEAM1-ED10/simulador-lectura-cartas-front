@@ -133,7 +133,7 @@ const Cards = () => {
 
           {selectedCardIds.length < 3 && (
             <div
-              className={`${StyleContainerBase} w-[1000px] h-[500px] grid grid-cols-12`}>
+              className={`${StyleContainerBase} w-[1000px] h-[500px] grid grid-cols-11`}>
               {dataCards.map((card: TarotCardAPI) => (
                 <Card
                   key={card.id}

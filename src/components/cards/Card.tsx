@@ -1,4 +1,3 @@
-import BACK from '../../assets/card-back/CARD_BACK.svg';
 import type { TarotCardAPI } from '../../types/carts-types';
 
 interface CardProps {
@@ -14,6 +13,9 @@ const Card: React.FC<CardProps> = ({
   isSelected,
   isDisabled,
 }) => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const imageUrlCardBack = `${apiUrl}/static/CARD_BACK.svg`;
+
   const baseClasses =
     'w-[120px] h-[190px]  bg-dark-halloween border-charred-umber border-2 cursor-pointer transition-transform duration-300';
   const selectedClasses =
@@ -37,7 +39,7 @@ const Card: React.FC<CardProps> = ({
       className={finalClasses}>
       <figure className="w-[120px] h-[190px">
         <img
-          src={BACK}
+          src={imageUrlCardBack}
           alt="Reverso de la carta"
           className="w-full h-full object-cover"
           loading="lazy"
