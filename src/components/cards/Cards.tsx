@@ -5,6 +5,8 @@ import useAllCards from '../../hooks/useAllCards';
 import type { TarotCardAPI } from '../../types/carts-types';
 import Spinner from '../common/Spinner';
 import { api } from '../../api/axios';
+import { motion } from "motion/react"
+import CardsMobile from './CardsMobile';
 
 const MAX_SELECCTIONS = 3;
 
@@ -77,9 +79,6 @@ const Cards = () => {
     setShowButton(false);
   };
 
-  const StyleContainerBase =
-    'place-items-center mb-8 relative before:absolute before:left-0 before:right-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparentter:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] gradient-to-r after:from-transparent after:via-old-gold after:to-transparent';
-
   if (loading) {
     return (
       <div className="w-full h-dvh flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
@@ -98,76 +97,173 @@ const Cards = () => {
 
   return (
     <>
-      <div className="h-dvh">
-        <div className="h-60 flex flex-col justify-evenly items-center">
-          <h1 className="text-6xl font-cardo text-old-gold">
+      <div className="w-full flex flex-col items-center justify-center gap-8">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: -60,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 1.5,
+          }}
+          className="w-full text-center flex flex-col gap-5">
+
+          <h1 className="text-4xl font-bold font-cardo text-old-gold uppercase md:text-5xl lg:text-6xl">
             Lectura de Cartas
           </h1>
-          <p className="text-2xl font-playfair-display">
+          <p className="text-lg font-medium font-playfair-display md:text-2xl lg:text-3xl">
             Descubre los secretos que las cartas tienen para relevarte.
           </p>
 
-          <p className="text-2xl font-cardo">
-            Elige
-            <span
-              className={`inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 ${isPredictionReady ? 'bg-old-gold text-charred-umber border-old-gold' : 'bg-gray-400 text-gray-700 border-gray-400'}`}>
-              {selectedCardIds.length}
-            </span>
-            de
-            <span className="inline-flex items-center justify-center w-16 h-16 rounded-full font-bold text-4xl border mx-2 text-old-gold border-old-gold">
-              {MAX_SELECCTIONS}
-            </span>
-            cartas
-          </p>
-        </div>
+          <div className="font-cardo relative flex items-center justify-center gap-16 p-8">
+            <div className="text-2xl md:text-4xl">
+              Elige
+            </div>
 
-        <div className="w-full flex flex-col items-center relative">
-          {selectedCardIds.length === 3 && (
-            <div
-              className={`${StyleContainerBase} w-[500px] h-[500px] grid grid-cols-3`}>
-              {filterSelectedCards.map((card: TarotCardAPI, index) => (
+            <div className="circle-outline relative flex items-center justify-center">
+              <div className={`text-5xl font-semibold z-10 ${selectedCardIds.length > 0 ? 'text-bone-white' : 'text-charred-umber'}`}>
+                {selectedCardIds.length}
+              </div>
+              <span className='absolute -left-12 w-1 h-1 rounded-full bg-old-gold'></span>
+              <span className='absolute -right-12 w-1 h-1 rounded-full bg-old-gold'></span>
+              <span className='absolute -bottom-9 w-1 h-1 rounded-full bg-old-gold'></span>
+              <span className='absolute -top-9 w-1 h-1 rounded-full bg-old-gold'></span>
+            </div>
+
+            <div className="text-2xl md:text-4xl">
+              cartas
+            </div>
+          </div>
+        </motion.div>
+
+        {selectedCardIds.length === 3 && (
+          <div
+            className='relative grid grid-cols-3 place-items-center gap-8 lg:gap-30 lg:flex lg:flex-row lg:justify-center py-7'>
+            {filterSelectedCards.map((card: TarotCardAPI, index) => (
+              <motion.div
+                key={index}
+                className="relative"
+                initial={{
+                  opacity: 0,
+                  y: -100,
+                  x: index === 0 ? -100 : index === 2 ? 100 : 0,
+                  rotate: index === 0 ? -15 : index === 2 ? 15 : 0,
+                  pointerEvents: 'none',
+                }}
+                animate={{
+                  opacity: 1,
+                  y: index === 1 ? -10 : 0,
+                  x: index === 0 ? 30 : index === 2 ? -30 : 0,
+                  rotate: index === 0 ? -15 : index === 2 ? 15 : 0,
+                  zIndex: index === 1 ? 1 : 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.5,
+                }}
+              >
                 <CardFlip key={card.id} card={card} index={index} />
-              ))}
-            </div>
-          )}
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-          {selectedCardIds.length < 3 && (
+        {selectedCardIds.length < 3 && (
+          <>
+            <CardsMobile
+              cards={dataCards}
+              onCardClick={handleCardClick}
+              selectedCardIds={selectedCardIds}
+              className='lg:hidden'
+            />
             <div
-              className={`${StyleContainerBase} w-[1000px] h-[500px] grid grid-cols-11`}>
-              {dataCards.map((card: TarotCardAPI) => (
-                <Card
-                  key={card.id}
-                  card={card}
-                  onClick={handleCardClick}
-                  isSelected={selectedCardIds.includes(card.id)}
-                  isDisabled={
-                    !selectedCardIds.includes(card.id) &&
-                    selectedCardIds.length === MAX_SELECCTIONS
-                  }
-                />
+              className='hidden relative w-full lg:grid grid-cols-11 place-content-center borders-cards-list gap-4 md:py-11'>
+              {dataCards.map((card: TarotCardAPI, index: number) => (
+                <motion.div
+                  key={index}
+                  className="relative cursor-pointer"
+                  style={{ zIndex: index }}
+                  initial={{
+                    opacity: 0,
+                    x: -500,
+                    y: -100,
+                    rotate: -15,
+                    scale: 0.8
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    rotate: 0,
+                    scale: 1
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.08,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15
+                  }}
+                >
+                  <Card
+                    key={card.id}
+                    card={card}
+                    onClick={handleCardClick}
+                    isSelected={selectedCardIds.includes(card.id)}
+                    isDisabled={
+                      !selectedCardIds.includes(card.id) &&
+                      selectedCardIds.length === MAX_SELECCTIONS
+                    }
+                  />
+                </motion.div>
               ))}
             </div>
-          )}
-        </div>
+          </>
+        )}
 
-        <div className="w-full mt-6 text-center">
-          {showButton && (
-            <button
-              onClick={handlePrediction}
-              disabled={!isPredictionReady}
-              className={`w-48 h-11 border-1 rounded-4xl font-cardo text-xl transition-colors
-              ${isPredictionReady ? 'bg-old-gold text-charred-umber hover:bg-goldenrod hover:text-white cursor-pointer' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}>
-              Predicción
-            </button>
-          )}
-          {isDisabledReset && (
-            <button
-              onClick={handleReset}
-              className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
-              Nueva Lectura
-            </button>
-          )}
-        </div>
+        {showButton && (
+          <motion.button
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 1,
+            }}
+            onClick={handlePrediction}
+            disabled={!isPredictionReady}
+            className={`absolute z-10 bottom-9 button_outline w-48 h-11 border-1 rounded-full font-cardo text-xl transition-colors
+              ${isPredictionReady ? 'text-bone-white hover:bg-ashen-gray/20 hover:text-white cursor-pointer' : 'text-charred-umber cursor-not-allowed'}`
+            }>
+
+            {
+              isPredictionReady && (
+                <>
+                  <span className='absolute top-1/2 -left-6 w-1 h-1 rounded-full bg-old-gold'></span>
+                  <span className='absolute top-1/2 -right-6 w-1 h-1 rounded-full bg-old-gold'></span>
+                  <label className="star_button w-4 absolute -top-0 left-0.5 opacity-100 rounded-full before:absolute before:-top-2 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
+                  <label className="star_button w-1/2 absolute -top-0 bottom-0.5 opacity-100 rounded-full before:absolute before:-top-1 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
+                </>
+              )
+            }
+            Predicción
+          </motion.button>
+        )}
+        {isDisabledReset && (
+          <button
+            onClick={handleReset}
+            className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
+            Nueva Lectura
+          </button>
+        )}
       </div>
     </>
   );
