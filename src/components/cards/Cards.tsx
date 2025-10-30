@@ -5,6 +5,9 @@ import useAllCards from '../../hooks/useAllCards';
 import type { TarotCardAPI } from '../../types/carts-types';
 import Spinner from '../common/Spinner';
 import { api } from '../../api/axios';
+import Modal from '../common/modal/Modal';
+import useModal from '../../hooks/useModal';
+import type { PredictionData } from '../../types/prediction.types';
 
 const MAX_SELECCTIONS = 3;
 
@@ -13,9 +16,13 @@ const Cards = () => {
   const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
 
   const { dataCards, loading, error } = useAllCards();
+  const { isOpen, openModal, closeModal } = useModal();
 
   const [isDisabledReset, setIsDisabledReset] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [dataPrediction, setDataPrediction] = useState<PredictionData | null>(
+    null
+  );
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -41,30 +48,20 @@ const Cards = () => {
   };
 
   const handlePrediction = async () => {
-    if (isPredictionReady) {
-      console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
-      const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
-        selectedCardIds.includes(card.id)
-      );
-      const card_ids = selectedCards.map(c => c.id);
+    const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
+      selectedCardIds.includes(card.id)
+    );
+    const card_ids = selectedCards.map(c => c.id);
 
-      try {
-        const response = await api.post('/predictions', { card_ids });
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error en Predicción:', error);
-      }
-
-      //console.log('Detalles de las cartas seleccionadas:', selectedCards);
-      //alert(
-      //  `Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`
-      //);
-      setIsDisabledReset(true);
-    } else {
-      console.log(
-        `Selecciona ${MAX_SELECCTIONS} cartas para obtener una predicción.`
-      );
+    try {
+      const response = await api.post('/predictions', { card_ids });
+      setDataPrediction(response.data);
+      openModal();
+    } catch (error) {
+      console.error('Error en Predicción:', error);
     }
+
+    setIsDisabledReset(true);
   };
 
   const filterSelectedCards = dataCards.filter(item =>
@@ -100,7 +97,7 @@ const Cards = () => {
     <>
       <div className="h-dvh">
         <div className="h-60 flex flex-col justify-evenly items-center">
-          <h1 className="text-6xl font-cardo text-old-gold">
+          <h1 className="text-6xl font-cardo text-old-gold ">
             Lectura de Cartas
           </h1>
           <p className="text-2xl font-playfair-display">
@@ -169,6 +166,7 @@ const Cards = () => {
           )}
         </div>
       </div>
+      {isOpen && <Modal dataPrediction={dataPrediction} close={closeModal} />}
     </>
   );
 };
