@@ -5,6 +5,9 @@ import useAllCards from '../../hooks/useAllCards';
 import type { TarotCardAPI } from '../../types/carts-types';
 import Spinner from '../common/Spinner';
 import { api } from '../../api/axios';
+import Modal from '../common/modal/Modal';
+import useModal from '../../hooks/useModal';
+import type { PredictionData } from '../../types/prediction.types';
 import { motion } from "motion/react"
 import CardsMobile from './CardsMobile';
 
@@ -15,9 +18,13 @@ const Cards = () => {
   const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
 
   const { dataCards, loading, error } = useAllCards();
+  const { isOpen, openModal, closeModal } = useModal();
 
   const [isDisabledReset, setIsDisabledReset] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [dataPrediction, setDataPrediction] = useState<PredictionData | null>(
+    null
+  );
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -43,30 +50,20 @@ const Cards = () => {
   };
 
   const handlePrediction = async () => {
-    if (isPredictionReady) {
-      console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
-      const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
-        selectedCardIds.includes(card.id)
-      );
-      const card_ids = selectedCards.map(c => c.id);
+    const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
+      selectedCardIds.includes(card.id)
+    );
+    const card_ids = selectedCards.map(c => c.id);
 
-      try {
-        const response = await api.post('/predictions', { card_ids });
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error en Predicción:', error);
-      }
-
-      //console.log('Detalles de las cartas seleccionadas:', selectedCards);
-      //alert(
-      //  `Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`
-      //);
-      setIsDisabledReset(true);
-    } else {
-      console.log(
-        `Selecciona ${MAX_SELECCTIONS} cartas para obtener una predicción.`
-      );
+    try {
+      const response = await api.post('/predictions', { card_ids });
+      setDataPrediction(response.data);
+      openModal();
+    } catch (error) {
+      console.error('Error en Predicción:', error);
     }
+
+    setIsDisabledReset(true);
   };
 
   const filterSelectedCards = dataCards.filter(item =>
@@ -225,46 +222,26 @@ const Cards = () => {
           </>
         )}
 
-        {showButton && (
-          <motion.button
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 1,
-            }}
-            onClick={handlePrediction}
-            disabled={!isPredictionReady}
-            className={`absolute z-10 bottom-9 button_outline w-48 h-11 border-1 rounded-full font-cardo text-xl transition-colors
-              ${isPredictionReady ? 'text-bone-white hover:bg-ashen-gray/20 hover:text-white cursor-pointer' : 'text-charred-umber cursor-not-allowed'}`
-            }>
-
-            {
-              isPredictionReady && (
-                <>
-                  <span className='absolute top-1/2 -left-6 w-1 h-1 rounded-full bg-old-gold'></span>
-                  <span className='absolute top-1/2 -right-6 w-1 h-1 rounded-full bg-old-gold'></span>
-                  <label className="star_button w-4 absolute -top-0 left-0.5 opacity-100 rounded-full before:absolute before:-top-2 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
-                  <label className="star_button w-1/2 absolute -top-0 bottom-0.5 opacity-100 rounded-full before:absolute before:-top-1 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
-                </>
-              )
-            }
-            Predicción
-          </motion.button>
-        )}
-        {isDisabledReset && (
-          <button
-            onClick={handleReset}
-            className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
-            Nueva Lectura
-          </button>
-        )}
+        <div className="w-full mt-6 text-center">
+          {showButton && (
+            <button
+              onClick={handlePrediction}
+              disabled={!isPredictionReady}
+              className={`w-48 h-11 border-1 rounded-4xl font-cardo text-xl transition-colors
+              ${isPredictionReady ? 'bg-old-gold text-charred-umber hover:bg-goldenrod hover:text-white cursor-pointer' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}>
+              Predicción
+            </button>
+          )}
+          {isDisabledReset && (
+            <button
+              onClick={handleReset}
+              className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
+              Nueva Lectura
+            </button>
+          )}
+        </div>
       </div>
+      {isOpen && <Modal dataPrediction={dataPrediction} close={closeModal} />}
     </>
   );
 };
