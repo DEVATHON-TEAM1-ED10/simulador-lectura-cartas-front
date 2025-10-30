@@ -15,6 +15,7 @@
 }
 
 @layer base {
+
   html,
   body {
     display: flex;
@@ -60,6 +61,12 @@
   }
 }
 
+@layer utilities {
+  .borders-cards-list {
+    @apply before:absolute before:left-0 before:right-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-old-gold before:to-transparent after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-old-gold after:to-transparent;
+  }
+}
+
 .font-cardo {
   font-family: 'Cardo', serif;
 }
@@ -80,19 +87,24 @@
   0% {
     transform: translateY(0);
   }
+
   20% {
     transform: translateY(5px);
   }
+
   40%,
   50% {
     transform: translateY(-5px);
   }
+
   60% {
     transform: translateY(-8px);
   }
+
   75% {
     transform: translateY(5px);
   }
+
   100% {
     transform: translateY(10px);
   }
@@ -102,19 +114,24 @@
   0% {
     transform: translate(0, 0);
   }
+
   20% {
     transform: translate(0px, 5px);
   }
+
   40%,
   50% {
     transform: translate(0px, -5px);
   }
+
   60% {
     transform: translate(-10px, -5px);
   }
+
   75% {
     transform: translate(-20px, 5px);
   }
+
   100% {
     transform: translate(0, 10px);
   }

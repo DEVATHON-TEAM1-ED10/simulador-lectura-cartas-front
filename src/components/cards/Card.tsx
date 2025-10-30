@@ -1,4 +1,5 @@
 import type { TarotCardAPI } from '../../types/carts-types';
+import Sparkles from '../common/Sparkles';
 
 interface CardProps {
   card: TarotCardAPI;
@@ -17,9 +18,9 @@ const Card: React.FC<CardProps> = ({
   const imageUrlCardBack = `${apiUrl}/static/CARD_BACK.svg`;
 
   const baseClasses =
-    'w-[120px] h-[190px]  bg-dark-halloween border-charred-umber border-2 cursor-pointer transition-transform duration-300';
+    'w-[244px] h-[365px] relative cursor-pointer transition-transform duration-300 md:w-[120px] md:h-[200px] box-shadow-card rounded-lg';
   const selectedClasses =
-    'border-2 border-old-gold scale-110 transform -translate-y-4 shadow-lg';
+    'scale-110 rounded-lg transform -translate-y-5 box-shadow-card selected';
   const disabledClasses = 'opacity-30 cursor-not-allowed pointer-events-none';
   const normalClasses = 'hover:scale-105';
 
@@ -36,12 +37,14 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={!isDisabled ? () => onClick(card.id) : undefined}
-      className={finalClasses}>
-      <figure className="w-[120px] h-[190px">
+      className={finalClasses}
+    >
+      {isSelected && <Sparkles />}
+      <figure className="w-full h-full">
         <img
           src={imageUrlCardBack}
           alt="Reverso de la carta"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-lg"
           loading="lazy"
         />
       </figure>

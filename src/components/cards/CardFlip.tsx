@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TarotCardAPI } from '../../types/carts-types';
+import Sparkles from '../common/Sparkles';
+import { motion } from 'motion/react';
 
 interface CardProps {
   card: TarotCardAPI;
@@ -24,29 +26,43 @@ const CardFlip = ({ card, index }: CardProps) => {
 
   return (
     <div className="[perspective:1000px]">
-      <div
-        className={`relative h-[190px] w-[120px] transition-all duration-[5000ms] [transform-style:preserve-3d] ${
-          isFlipped ? '[transform:rotateY(180deg)]' : ''
-        }`}>
-        <figure className="absolute inset-0 h-full w-full border-charred-umber border-2 [backface-visibility:hidden]">
+      <motion.div
+        style={{ transformStyle: 'preserve-3d' }}
+        animate={{
+          rotateY: isFlipped ? 180 : 0,
+          scale: isFlipped ? 1.02 : 1,
+          boxShadow: isFlipped
+            ? '0 20px 40px rgba(0,0,0,0.25)'
+            : '0 6px 18px rgba(0,0,0,0.12)',
+        }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
+        className={`relative w-[120px] h-[240px] md:h-[390px] md:w-[220px] ${isFlipped ? 'selected' : ''}`}>
+        <figure
+          className="absolute inset-0 h-full w-full rounded-[12px] overflow-hidden"
+          style={{ backfaceVisibility: 'hidden' }}>
           <img
             src={imageUrlCardBack}
             alt="Reverso de la carta"
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full pointer-events-none"
             loading="lazy"
           />
         </figure>
 
-        <figure className="absolute inset-0 h-full w-full border-charred-umber border-2 [transform:rotateY(180deg)] [backface-visibility:hidden]">
+        <figure
+          className="absolute inset-0 h-full w-full"
+          style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}>
+          <figcaption
+            className="bg-opacity-50 w-full text-sm md:text-lg py-1 text-center rounded-md font-playfair-display text-shadow-2xs text-shadow-bone-white absolute -top-9 left-1/2 transform -translate-x-1/2 px-2"
+          >{card.name}</figcaption>
+          <Sparkles />
           <img
             src={imageUrl}
             alt="Frente de la carta"
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full rounded-[12px] pointer-events-none"
             loading="lazy"
           />
-          <figcaption>{card.name}</figcaption>
         </figure>
-      </div>
+      </motion.div>
     </div>
   );
 };
