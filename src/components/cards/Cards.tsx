@@ -29,7 +29,7 @@ const Cards = () => {
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     if (isPredictionReady) {
-      timer = setTimeout(() => setShowButton(true), 5000);
+      timer = setTimeout(() => setShowButton(true), 3000);
     }
 
     return () => clearTimeout(timer);
@@ -76,7 +76,7 @@ const Cards = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-dvh flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
+      <div className="w-full h-dvh absolute flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
         <Spinner size="large" />
       </div>
     );
@@ -84,7 +84,7 @@ const Cards = () => {
 
   if (error) {
     return (
-      <div className="w-full h-dvh flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
+      <div className="w-full h-dvh absolute flex justify-center items-center backdrop-blur-sm bg-black/30 z-50">
         <h1 className="text-6xl font-cardo text-old-gold">{error.message}</h1>
       </div>
     );
