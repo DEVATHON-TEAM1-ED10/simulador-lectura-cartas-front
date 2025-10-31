@@ -8,7 +8,7 @@ const CardFlipModal = ({ imageUrl, cardName }: Props) => {
   return (
     <div className="[perspective:1000px]">
       <div
-        className='w-[110px] h-[180px] md:w-[155px] md:h-[249px] relative'>
+        className='w-[110px] h-[180px] md:w-[175px] md:h-[260px] relative'>
         <figure className="absolute inset-0">
           <img
             src={imageUrl}

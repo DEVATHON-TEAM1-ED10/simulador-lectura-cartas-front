@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
+import type { TarotCardAPI } from '../../types/carts-types';
+import type { PredictionData } from '../../types/prediction.types';
+import { motion } from "motion/react"
 import Card from './Card';
 import CardFlip from './CardFlip';
 import useAllCards from '../../hooks/useAllCards';
-import type { TarotCardAPI } from '../../types/carts-types';
 import Spinner from '../common/Spinner';
 import { api } from '../../api/axios';
 import Modal from '../common/modal/Modal';
 import useModal from '../../hooks/useModal';
-import type { PredictionData } from '../../types/prediction.types';
-import { motion } from "motion/react"
 import CardsMobile from './CardsMobile';
+
+import predictions from '../../data/predictions.json';
 
 const MAX_SELECCTIONS = 3;
 
@@ -20,10 +22,15 @@ const Cards = () => {
   const { dataCards, loading, error } = useAllCards();
   const { isOpen, openModal, closeModal } = useModal();
 
+  const [lastCardIds, setLastCardIds] = useState<number[]>([]);
+  const [messagePrediction, setMessagePrediction] = useState('');
+
   const [showButton, setShowButton] = useState(false);
   const [dataPrediction, setDataPrediction] = useState<PredictionData | null>(
     null
   );
+
+  const [tonePrediction, setTonePrediction] = useState('');
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -54,10 +61,41 @@ const Cards = () => {
     );
     const card_ids = selectedCards.map(c => c.card.id);
 
+    const cardsChanged =
+      card_ids.length !== lastCardIds.length ||
+      card_ids.some((id, index) => id !== lastCardIds[index]);
+
+    if (!cardsChanged && dataPrediction) {
+      // Si no cambiaron las cartas, solo abre el modal sin regenerar la predicción
+      openModal();
+      return;
+    }
+
     try {
       const response = await api.post('/predictions', { card_ids });
+
+      const tone = response.data.tone;
+      //Es el número de predicciones por categoria
+      const totalPredictions = 10;
+      const randomPrediction = Math.floor(Math.random() * totalPredictions);
+
+      let newPrediction = '';
+      if (tone === 'neutral') {
+        newPrediction = predictions.neutras[randomPrediction].prediccion;
+        setTonePrediction('Neutral');
+      } else if (tone === 'positive') {
+        newPrediction = predictions.positivas[randomPrediction].prediccion;
+        setTonePrediction('Positiva');
+      } else if (tone === 'challenging') {
+        newPrediction = predictions.negativas[randomPrediction].prediccion;
+        setTonePrediction('Negativa');
+      }
+
+      setMessagePrediction(newPrediction);
+      setLastCardIds(card_ids); // Guarda las cartas actuales
       setDataPrediction(response.data);
       openModal();
+
     } catch (error) {
       console.error('Error en Predicción:', error);
     }
@@ -107,8 +145,10 @@ const Cards = () => {
           }}
           className="w-full text-center flex flex-col gap-5">
 
-          <h1 className="text-4xl font-bold font-cardo text-old-gold uppercase md:text-5xl lg:text-6xl">
+          <h1 className="text-4xl relative font-bold font-cardo text-old-gold uppercase md:text-5xl lg:text-6xl">
             Lectura de Cartas
+            <span className='absolute top-1/2 left-36 w-2 h-2 rounded-full bg-old-gold'></span>
+            <span className='absolute top-1/2 right-36 w-2 h-2 rounded-full bg-old-gold'></span>
           </h1>
           <p className="text-lg font-medium font-playfair-display md:text-2xl lg:text-3xl">
             Descubre los secretos que las cartas tienen para relevarte.
@@ -313,7 +353,14 @@ const Cards = () => {
           </motion.button>
         )}
       </div>
-      {isOpen && <Modal dataPrediction={dataPrediction} onNewPrediction={handleReset} />}
+      {isOpen &&
+        <Modal
+          dataPrediction={dataPrediction}
+          onNewPrediction={handleReset}
+          messagePrediction={messagePrediction}
+          tonePrediction={tonePrediction}
+        />
+      }
     </>
   );
 };
