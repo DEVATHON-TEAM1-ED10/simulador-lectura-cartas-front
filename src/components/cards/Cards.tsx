@@ -14,13 +14,12 @@ import CardsMobile from './CardsMobile';
 const MAX_SELECCTIONS = 3;
 
 const Cards = () => {
-  const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
+  const [selectedCardIds, setSelectedCardIds] = useState<number[]>([]);
   const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
 
   const { dataCards, loading, error } = useAllCards();
   const { isOpen, openModal, closeModal } = useModal();
 
-  const [isDisabledReset, setIsDisabledReset] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [dataPrediction, setDataPrediction] = useState<PredictionData | null>(
     null
@@ -36,7 +35,7 @@ const Cards = () => {
     return () => clearTimeout(timer);
   }, [isPredictionReady]);
 
-  const handleCardClick = (cardId: string) => {
+  const handleCardClick = (cardId: number) => {
     setSelectedCardIds(prevSelectedIds => {
       if (prevSelectedIds.includes(cardId)) {
         return prevSelectedIds.filter(id => id !== cardId);
@@ -50,10 +49,10 @@ const Cards = () => {
   };
 
   const handlePrediction = async () => {
-    const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
-      selectedCardIds.includes(card.id)
+    const selectedCards: TarotCardAPI[] = dataCards.filter(item =>
+      selectedCardIds.includes(item.card.id)
     );
-    const card_ids = selectedCards.map(c => c.id);
+    const card_ids = selectedCards.map(c => c.card.id);
 
     try {
       const response = await api.post('/predictions', { card_ids });
@@ -63,17 +62,16 @@ const Cards = () => {
       console.error('Error en Predicción:', error);
     }
 
-    setIsDisabledReset(true);
   };
 
   const filterSelectedCards = dataCards.filter(item =>
-    selectedCardIds.includes(item.id)
+    selectedCardIds.includes(item.card.id)
   );
 
   const handleReset = () => {
     setSelectedCardIds([]);
-    setIsDisabledReset(false);
     setShowButton(false);
+    closeModal();
   };
 
   if (loading) {
@@ -140,7 +138,7 @@ const Cards = () => {
         {selectedCardIds.length === 3 && (
           <div
             className='relative grid grid-cols-3 place-items-center gap-8 lg:gap-30 lg:flex lg:flex-row lg:justify-center py-7'>
-            {filterSelectedCards.map((card: TarotCardAPI, index) => (
+            {filterSelectedCards.map((item: TarotCardAPI, index: number) => (
               <motion.div
                 key={index}
                 className="relative"
@@ -163,7 +161,7 @@ const Cards = () => {
                   delay: index * 0.5,
                 }}
               >
-                <CardFlip key={card.id} card={card} index={index} />
+                <CardFlip key={item.card.id} card={item.card} index={index} />
               </motion.div>
             ))}
           </div>
@@ -177,9 +175,11 @@ const Cards = () => {
               selectedCardIds={selectedCardIds}
               className='lg:hidden'
             />
-            <div
+            <motion.div
+              transition={{ duration: 1 }}
+              exit={{ opacity: 0, y: 50 }}
               className='hidden relative w-full lg:grid grid-cols-11 place-content-center borders-cards-list gap-4 md:py-11'>
-              {dataCards.map((card: TarotCardAPI, index: number) => (
+              {dataCards.map((item: TarotCardAPI, index: number) => (
                 <motion.div
                   key={index}
                   className="relative cursor-pointer"
@@ -207,41 +207,113 @@ const Cards = () => {
                   }}
                 >
                   <Card
-                    key={card.id}
-                    card={card}
+                    key={item.card.id}
+                    card={item.card}
                     onClick={handleCardClick}
-                    isSelected={selectedCardIds.includes(card.id)}
+                    isSelected={selectedCardIds.includes(item.card.id)}
                     isDisabled={
-                      !selectedCardIds.includes(card.id) &&
+                      !selectedCardIds.includes(item.card.id) &&
                       selectedCardIds.length === MAX_SELECCTIONS
                     }
                   />
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </>
         )}
 
-        <div className="w-full mt-6 text-center">
-          {showButton && (
-            <button
-              onClick={handlePrediction}
-              disabled={!isPredictionReady}
-              className={`w-48 h-11 border-1 rounded-4xl font-cardo text-xl transition-colors
-              ${isPredictionReady ? 'bg-old-gold text-charred-umber hover:bg-goldenrod hover:text-white cursor-pointer' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}>
-              Predicción
-            </button>
-          )}
-          {isDisabledReset && (
-            <button
-              onClick={handleReset}
-              className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
-              Nueva Lectura
-            </button>
-          )}
-        </div>
+        {showButton && (
+          <motion.button
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 1.4,
+            }}
+            onClick={handlePrediction}
+            disabled={!isPredictionReady}
+            className={`absolute z-10 bottom-16 md:bottom-9 button_outline w-48 h-11 border-1 rounded-full font-cardo text-xl transition-colors
+    ${isPredictionReady ? 'text-bone-white hover:bg-ashen-gray/20 hover:text-white cursor-pointer' : 'text-charred-umber cursor-not-allowed'}`
+            }>
+
+            {isPredictionReady && (
+              <>
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-old-gold shadow-[0_0_8px_2px_rgba(212,175,55,0.6)]'
+                  animate={{
+                    opacity: [1, 0.6, 1],
+                    scale: [1, 1.2, 1],
+                    x: [0, 80, 80, 0, -80, -80, 0],
+                    y: [0, -20, 20, 40, 20, -20, 0],
+                  }}
+                  transition={{
+                    duration: 14,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1
+                  }}
+                  style={{ marginLeft: '-4px', marginTop: '-4px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-bone-white shadow-[0_0_6px_2px_rgba(255,255,255,0.5)]'
+                  animate={{
+                    x: [0, -70, -70, 0, 70, 70, 0],
+                    y: [0, 25, -25, -35, -25, 25, 0],
+                  }}
+                  transition={{
+                    duration: 15,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  style={{ marginLeft: '-3px', marginTop: '-3px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-old-gold shadow-[0_0_5px_1px_rgba(212,175,55,0.7)]'
+                  animate={{
+                    x: [0, 60, 0, -60, 0],
+                    y: [0, -30, -40, -30, 0],
+                  }}
+                  transition={{
+                    duration: 13.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1
+                  }}
+                  style={{ marginLeft: '-2px', marginTop: '-2px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-bone-white/80 shadow-[0_0_6px_1px_rgba(255,255,255,0.4)]'
+                  animate={{
+                    x: [0, -50, 0, 50, 0],
+                    y: [0, 30, 35, 30, 0],
+                  }}
+                  transition={{
+                    duration: 14.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1.5,
+                  }}
+                  style={{ marginLeft: '-3px', marginTop: '-3px' }}
+                />
+
+                <span className='absolute top-1/2 -left-6 w-1 h-1 rounded-full bg-old-gold'></span>
+                <span className='absolute top-1/2 -right-6 w-1 h-1 rounded-full bg-old-gold'></span>
+              </>
+            )}
+
+            Predicción
+          </motion.button>
+        )}
       </div>
-      {isOpen && <Modal dataPrediction={dataPrediction} close={closeModal} />}
+      {isOpen && <Modal dataPrediction={dataPrediction} onNewPrediction={handleReset} />}
     </>
   );
 };

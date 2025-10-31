@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { TarotCardAPI } from '../../types/carts-types';
 import Sparkles from '../common/Sparkles';
 import { motion } from 'motion/react';
+import type { Card } from '../../types/prediction.types';
 
 interface CardProps {
-  card: TarotCardAPI;
+  card: Card;
   index: number;
 }
 
