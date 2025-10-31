@@ -14,10 +14,9 @@ const useAllCards = () => {
 
     const getDataAllCarts = async () => {
       try {
-        const response = await api.get('/cards', { signal: controller.signal });
-        //console.log(response);
+        const response = await api.get('/cards/draw?count=22', { signal: controller.signal });
 
-        setDataCards(response.data);
+        setDataCards(response.data.cards);
       } catch (error) {
         setError(error as Error);
       } finally {

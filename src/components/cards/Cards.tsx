@@ -5,19 +5,25 @@ import useAllCards from '../../hooks/useAllCards';
 import type { TarotCardAPI } from '../../types/carts-types';
 import Spinner from '../common/Spinner';
 import { api } from '../../api/axios';
+import Modal from '../common/modal/Modal';
+import useModal from '../../hooks/useModal';
+import type { PredictionData } from '../../types/prediction.types';
 import { motion } from "motion/react"
 import CardsMobile from './CardsMobile';
 
 const MAX_SELECCTIONS = 3;
 
 const Cards = () => {
-  const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
+  const [selectedCardIds, setSelectedCardIds] = useState<number[]>([]);
   const isPredictionReady: boolean = selectedCardIds.length === MAX_SELECCTIONS;
 
   const { dataCards, loading, error } = useAllCards();
+  const { isOpen, openModal, closeModal } = useModal();
 
-  const [isDisabledReset, setIsDisabledReset] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [dataPrediction, setDataPrediction] = useState<PredictionData | null>(
+    null
+  );
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -29,7 +35,7 @@ const Cards = () => {
     return () => clearTimeout(timer);
   }, [isPredictionReady]);
 
-  const handleCardClick = (cardId: string) => {
+  const handleCardClick = (cardId: number) => {
     setSelectedCardIds(prevSelectedIds => {
       if (prevSelectedIds.includes(cardId)) {
         return prevSelectedIds.filter(id => id !== cardId);
@@ -43,40 +49,29 @@ const Cards = () => {
   };
 
   const handlePrediction = async () => {
-    if (isPredictionReady) {
-      console.log('Cartas seleccionadas para la predicción:', selectedCardIds);
-      const selectedCards: TarotCardAPI[] = dataCards.filter(card =>
-        selectedCardIds.includes(card.id)
-      );
-      const card_ids = selectedCards.map(c => c.id);
+    const selectedCards: TarotCardAPI[] = dataCards.filter(item =>
+      selectedCardIds.includes(item.card.id)
+    );
+    const card_ids = selectedCards.map(c => c.card.id);
 
-      try {
-        const response = await api.post('/predictions', { card_ids });
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error en Predicción:', error);
-      }
-
-      //console.log('Detalles de las cartas seleccionadas:', selectedCards);
-      //alert(
-      //  `Has seleccionado: ${selectedCards.map(c => c.name).join(',')}. Revisa la consola para más detalles.`
-      //);
-      setIsDisabledReset(true);
-    } else {
-      console.log(
-        `Selecciona ${MAX_SELECCTIONS} cartas para obtener una predicción.`
-      );
+    try {
+      const response = await api.post('/predictions', { card_ids });
+      setDataPrediction(response.data);
+      openModal();
+    } catch (error) {
+      console.error('Error en Predicción:', error);
     }
+
   };
 
   const filterSelectedCards = dataCards.filter(item =>
-    selectedCardIds.includes(item.id)
+    selectedCardIds.includes(item.card.id)
   );
 
   const handleReset = () => {
     setSelectedCardIds([]);
-    setIsDisabledReset(false);
     setShowButton(false);
+    closeModal();
   };
 
   if (loading) {
@@ -143,7 +138,7 @@ const Cards = () => {
         {selectedCardIds.length === 3 && (
           <div
             className='relative grid grid-cols-3 place-items-center gap-8 lg:gap-30 lg:flex lg:flex-row lg:justify-center py-7'>
-            {filterSelectedCards.map((card: TarotCardAPI, index) => (
+            {filterSelectedCards.map((item: TarotCardAPI, index: number) => (
               <motion.div
                 key={index}
                 className="relative"
@@ -166,7 +161,7 @@ const Cards = () => {
                   delay: index * 0.5,
                 }}
               >
-                <CardFlip key={card.id} card={card} index={index} />
+                <CardFlip key={item.card.id} card={item.card} index={index} />
               </motion.div>
             ))}
           </div>
@@ -180,9 +175,11 @@ const Cards = () => {
               selectedCardIds={selectedCardIds}
               className='lg:hidden'
             />
-            <div
+            <motion.div
+              transition={{ duration: 1 }}
+              exit={{ opacity: 0, y: 50 }}
               className='hidden relative w-full lg:grid grid-cols-11 place-content-center borders-cards-list gap-4 md:py-11'>
-              {dataCards.map((card: TarotCardAPI, index: number) => (
+              {dataCards.map((item: TarotCardAPI, index: number) => (
                 <motion.div
                   key={index}
                   className="relative cursor-pointer"
@@ -210,18 +207,18 @@ const Cards = () => {
                   }}
                 >
                   <Card
-                    key={card.id}
-                    card={card}
+                    key={item.card.id}
+                    card={item.card}
                     onClick={handleCardClick}
-                    isSelected={selectedCardIds.includes(card.id)}
+                    isSelected={selectedCardIds.includes(item.card.id)}
                     isDisabled={
-                      !selectedCardIds.includes(card.id) &&
+                      !selectedCardIds.includes(item.card.id) &&
                       selectedCardIds.length === MAX_SELECCTIONS
                     }
                   />
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </>
         )}
 
@@ -236,35 +233,87 @@ const Cards = () => {
               y: 0,
             }}
             transition={{
-              duration: 1,
+              duration: 1.4,
             }}
             onClick={handlePrediction}
             disabled={!isPredictionReady}
-            className={`absolute z-10 bottom-9 button_outline w-48 h-11 border-1 rounded-full font-cardo text-xl transition-colors
-              ${isPredictionReady ? 'text-bone-white hover:bg-ashen-gray/20 hover:text-white cursor-pointer' : 'text-charred-umber cursor-not-allowed'}`
+            className={`absolute z-10 bottom-16 md:bottom-9 button_outline w-48 h-11 border-1 rounded-full font-cardo text-xl transition-colors
+    ${isPredictionReady ? 'text-bone-white hover:bg-ashen-gray/20 hover:text-white cursor-pointer' : 'text-charred-umber cursor-not-allowed'}`
             }>
 
-            {
-              isPredictionReady && (
-                <>
-                  <span className='absolute top-1/2 -left-6 w-1 h-1 rounded-full bg-old-gold'></span>
-                  <span className='absolute top-1/2 -right-6 w-1 h-1 rounded-full bg-old-gold'></span>
-                  <label className="star_button w-4 absolute -top-0 left-0.5 opacity-100 rounded-full before:absolute before:-top-2 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
-                  <label className="star_button w-1/2 absolute -top-0 bottom-0.5 opacity-100 rounded-full before:absolute before:-top-1 before:w-0.5 before:h-0.5 before:bg-bone-white"></label>
-                </>
-              )
-            }
+            {isPredictionReady && (
+              <>
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-old-gold shadow-[0_0_8px_2px_rgba(212,175,55,0.6)]'
+                  animate={{
+                    opacity: [1, 0.6, 1],
+                    scale: [1, 1.2, 1],
+                    x: [0, 80, 80, 0, -80, -80, 0],
+                    y: [0, -20, 20, 40, 20, -20, 0],
+                  }}
+                  transition={{
+                    duration: 14,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1
+                  }}
+                  style={{ marginLeft: '-4px', marginTop: '-4px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-bone-white shadow-[0_0_6px_2px_rgba(255,255,255,0.5)]'
+                  animate={{
+                    x: [0, -70, -70, 0, 70, 70, 0],
+                    y: [0, 25, -25, -35, -25, 25, 0],
+                  }}
+                  transition={{
+                    duration: 15,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  style={{ marginLeft: '-3px', marginTop: '-3px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-old-gold shadow-[0_0_5px_1px_rgba(212,175,55,0.7)]'
+                  animate={{
+                    x: [0, 60, 0, -60, 0],
+                    y: [0, -30, -40, -30, 0],
+                  }}
+                  transition={{
+                    duration: 13.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1
+                  }}
+                  style={{ marginLeft: '-2px', marginTop: '-2px' }}
+                />
+
+                <motion.span
+                  className='absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-bone-white/80 shadow-[0_0_6px_1px_rgba(255,255,255,0.4)]'
+                  animate={{
+                    x: [0, -50, 0, 50, 0],
+                    y: [0, 30, 35, 30, 0],
+                  }}
+                  transition={{
+                    duration: 14.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: 1.5,
+                  }}
+                  style={{ marginLeft: '-3px', marginTop: '-3px' }}
+                />
+
+                <span className='absolute top-1/2 -left-6 w-1 h-1 rounded-full bg-old-gold'></span>
+                <span className='absolute top-1/2 -right-6 w-1 h-1 rounded-full bg-old-gold'></span>
+              </>
+            )}
+
             Predicción
           </motion.button>
         )}
-        {isDisabledReset && (
-          <button
-            onClick={handleReset}
-            className="w-48 h-11 ml-10  border-1 rounded-4xl font-cardo text-xl transition-colors bg-gray-400 text-gray-700">
-            Nueva Lectura
-          </button>
-        )}
       </div>
+      {isOpen && <Modal dataPrediction={dataPrediction} onNewPrediction={handleReset} />}
     </>
   );
 };

@@ -23,8 +23,8 @@ interface CardsMobileProps {
   loop?: boolean;
   autoplay?: boolean;
   spaceBetween?: number;
-  onCardClick: (cardId: string) => void;
-  selectedCardIds: string[];
+  onCardClick: (cardId: number) => void;
+  selectedCardIds: number[];
 }
 
 function CardsMobile({
@@ -94,13 +94,13 @@ function CardsMobile({
         }}
         modules={[EffectCoverflow, Autoplay, Pagination, Navigation]}
       >
-        {cards.map((card, index) => (
+        {cards.map((item, index) => (
           <SwiperSlide key={index}
             style={{
               width: 'auto',
               height: 'auto',
               backgroundColor: "transparent",
-              backgroundImage: `url(${card.imageUrl})`,
+              backgroundImage: `url(${item.card.imageUrl})`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
               boxShadow: "none",
@@ -108,12 +108,12 @@ function CardsMobile({
               borderRadius: "32px"
             }}>
             <Card
-              key={card.id}
-              card={card}
+              key={item.card.id}
+              card={item.card}
               onClick={onCardClick}
-              isSelected={selectedCardIds.includes(card.id)}
+              isSelected={selectedCardIds.includes(item.card.id)}
               isDisabled={
-                !selectedCardIds.includes(card.id) &&
+                !selectedCardIds.includes(item.card.id) &&
                 selectedCardIds.length === MAX_SELECCTIONS
               }
             />
@@ -122,15 +122,15 @@ function CardsMobile({
         {showNavigation && (
           <div>
             <div className="swiper-button-next !text-transparent !w-[70px] after:hidden">
-              <div className="transform -rotate-90 rounded-full">
+              <div className="transform -rotate-90 bg-old-gold rounded-full p-1">
                 <img
-                  className="w-full h-full fill-bone-white drop-shadow-lg drop-shadow-bone-white"
+                  className="w-full h-full"
                   src="/src/assets/icons/down-arrow.svg" alt="Siguiente" />
               </div>
             </div>
             <div className="swiper-button-prev !w-[70px] !text-transparent after:hidden">
-              <div className="text-white transform rotate-90">
-                <img className="w-full h-full fill-bone-white drop-shadow-lg drop-shadow-bone-white" src="/src/assets/icons/down-arrow.svg" alt="Anterior" />
+              <div className="transform rotate-90 bg-old-gold rounded-full p-1">
+                <img className="w-full h-full" src="/src/assets/icons/down-arrow.svg" alt="Anterior" />
               </div>
             </div>
           </div>

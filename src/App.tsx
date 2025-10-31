@@ -1,5 +1,6 @@
 import './App.css';
 import Cards from './components/cards/Cards';
+import BackgroundMisctic from './components/common/BackgroundMisctic';
 import LightRays from './components/common/LightRays';
 import Noise from './components/common/Noise';
 
@@ -18,6 +19,7 @@ function App() {
         className='hidden md:block'
       />
       <Noise />
+      <BackgroundMisctic />
       <Cards />
     </div>
   );

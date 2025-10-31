@@ -1,9 +1,9 @@
-import type { TarotCardAPI } from '../../types/carts-types';
+import type { Card } from '../../types/prediction.types';
 import Sparkles from '../common/Sparkles';
 
 interface CardProps {
-  card: TarotCardAPI;
-  onClick: (Cardid: string) => void;
+  card: Card;
+  onClick: (Cardid: number) => void;
   isSelected: boolean;
   isDisabled: boolean;
 }
